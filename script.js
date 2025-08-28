@@ -10,21 +10,9 @@ let questionTriggerY = canvas.height / 3 + 50;
 let questionIndex = 0;
 let score = 0;
 
-// 按鈕相關變數
-const restartButton = {
-    x: 20,
-    y: canvas.height - 70,
-    width: 150,
-    height: 50
-};
-const playAgainButton = {
-    x: canvas.width / 2 - 100,
-    y: canvas.height / 2 + 50,
-    width: 200,
-    height: 50
-};
-
-// 圖片載入相關變數
+// 按鈕與圖片相關變數
+const restartButton = { x: 20, y: canvas.height - 70, width: 150, height: 50 };
+const playAgainButton = { x: canvas.width / 2 - 100, y: canvas.height / 2 + 50, width: 200, height: 50 };
 const roadImage = new Image();
 const carImage = new Image();
 
@@ -57,8 +45,8 @@ const allQuestions = [
     },
     {
         question: "小小孩開小小卡丁車可以訓練?",
-        options: ["專注力與判斷力", "動作協調與核心控制", "兩者皆是"],
-        correctAnswer: "兩者皆是"
+        options: ["專注力與判斷力", "動作協調與核心控制", "以上皆是"],
+        correctAnswer: "以上皆是"
     }
 ];
 
@@ -76,7 +64,6 @@ function loadAssets() {
 
     roadImage.onload = imageLoaded;
     carImage.onload = imageLoaded;
-
     roadImage.onerror = () => { console.error("道路圖片載入失敗。"); imageLoaded(); };
     carImage.onerror = () => { console.error("卡丁車圖片載入失敗。"); imageLoaded(); };
 
@@ -177,11 +164,9 @@ function drawGameComplete() {
     ctx.font = '40px Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-
     const message = score === 100 ? "恭喜你！滿分通過所有關卡！" : "遊戲結束！";
     ctx.fillText(message, canvas.width / 2, canvas.height / 2 - 80);
     ctx.fillText(`你的分數是 ${score}/${allQuestions.length * 20}`, canvas.width / 2, canvas.height / 2 - 20);
-
     drawButton("再玩一次", playAgainButton.x, playAgainButton.y, playAgainButton.width, playAgainButton.height, '#2ecc71');
 }
 
@@ -194,7 +179,8 @@ function drawStartScreen() {
     ctx.textBaseline = 'middle';
     ctx.fillText("三岔路口問答遊戲", canvas.width / 2, canvas.height / 2 - 50);
     ctx.font = '20px Arial';
-    ctx.fillText("按下方按鍵開始遊戲"<br>"手機請橫屏遊玩", canvas.width / 2, canvas.height / 2 + 20);
+    ctx.fillText("按下方按鍵開始遊戲", canvas.width / 2, canvas.height / 2 + 20);
+    ctx.fillText("手機請橫屏遊玩", canvas.width / 2, canvas.height / 2 + 50);
 }
 
 // 遊戲迴圈
@@ -249,7 +235,9 @@ function gameLoop() {
 // 處理玩家輸入的統一函式
 function handlePlayerInput(direction) {
     if (gameState === 'start') {
-        gameState = 'moving';
+        if (direction === 'up') {
+            gameState = 'moving';
+        }
         return;
     }
 
@@ -285,61 +273,59 @@ function handlePlayerInput(direction) {
     }
 }
 
-// 鍵盤事件監聽器
-document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowUp') handlePlayerInput('up');
-    else if (e.key === 'ArrowDown') handlePlayerInput('down');
-    else if (e.key === 'ArrowLeft') handlePlayerInput('left');
-    else if (e.key === 'ArrowRight') handlePlayerInput('right');
-});
+// 設置事件監聽器
+function setupEventListeners() {
+    // 鍵盤事件
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowUp') handlePlayerInput('up');
+        else if (e.key === 'ArrowDown') handlePlayerInput('down');
+        else if (e.key === 'ArrowLeft') handlePlayerInput('left');
+        else if (e.key === 'ArrowRight') handlePlayerInput('right');
+    });
 
-document.addEventListener('keyup', (e) => {
-    if (gameState === 'moving') {
-        car.angle = 0;
+    document.addEventListener('keyup', () => {
+        if (gameState === 'moving') {
+            car.angle = 0;
+        }
+    });
+
+    // 虛擬按鈕事件
+    if (upButton && leftButton && rightButton) {
+        upButton.addEventListener('mousedown', () => handlePlayerInput('up'));
+        leftButton.addEventListener('mousedown', () => handlePlayerInput('left'));
+        rightButton.addEventListener('mousedown', () => handlePlayerInput('right'));
+
+        leftButton.addEventListener('mouseup', () => car.angle = 0);
+        rightButton.addEventListener('mouseup', () => car.angle = 0);
+
+        // 考慮手機觸控事件
+        upButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('up'); });
+        leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('left'); });
+        rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('right'); });
+
+        leftButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
+        rightButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
     }
-});
 
-// 虛擬按鈕事件監聽器
-if (upButton && leftButton && rightButton) {
-    upButton.addEventListener('mousedown', () => handlePlayerInput('up'));
-    leftButton.addEventListener('mousedown', () => handlePlayerInput('left'));
-    rightButton.addEventListener('mousedown', () => handlePlayerInput('right'));
-    
-    // 讓按鈕放開時重置角度
-    leftButton.addEventListener('mouseup', () => car.angle = 0);
-    rightButton.addEventListener('mouseup', () => car.angle = 0);
-    
-    // 考慮手機觸控事件
-    upButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('up'); });
-    leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('left'); });
-    rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('right'); });
-    
-    leftButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
-    rightButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
+    // Canvas 點擊事件 (用於重新開始按鈕)
+    canvas.addEventListener('click', (event) => {
+        const rect = canvas.getBoundingClientRect();
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        if (mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width &&
+            mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height) {
+            resetGame();
+        }
+        if (gameState === 'gameComplete' &&
+            mouseX >= playAgainButton.x && mouseX <= playAgainButton.x + playAgainButton.width &&
+            mouseY >= playAgainButton.y && mouseY <= playAgainButton.y + playAgainButton.height) {
+            resetGame();
+        }
+    });
 }
 
-// 點擊事件監聽器 (用於重新開始按鈕)
-canvas.addEventListener('click', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    if (mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width &&
-        mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height) {
-        resetGame();
-    }
-    if (gameState === 'gameComplete' &&
-        mouseX >= playAgainButton.x && mouseX <= playAgainButton.x + playAgainButton.width &&
-        mouseY >= playAgainButton.y && mouseY <= playAgainButton.y + playAgainButton.height) {
-        resetGame();
-    }
-});
-
-// 啟動遊戲迴圈與資源載入
-gameLoop();
+// 啟動遊戲
 loadAssets();
-
-
-
-
-
+gameLoop();
+setupEventListeners();
