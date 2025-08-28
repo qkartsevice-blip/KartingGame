@@ -194,7 +194,7 @@ function drawStartScreen() {
     ctx.textBaseline = 'middle';
     ctx.fillText("三岔路口問答遊戲", canvas.width / 2, canvas.height / 2 - 50);
     ctx.font = '20px Arial';
-    ctx.fillText("按任意鍵開始遊戲", canvas.width / 2, canvas.height / 2 + 20);
+    ctx.fillText("按下方按鍵開始遊戲"<br>"手機請橫屏遊玩", canvas.width / 2, canvas.height / 2 + 20);
 }
 
 // 遊戲迴圈
@@ -338,6 +338,7 @@ canvas.addEventListener('click', (event) => {
 // 啟動遊戲迴圈與資源載入
 gameLoop();
 loadAssets();
+
 
 
 
