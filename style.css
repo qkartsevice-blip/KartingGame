@@ -17,12 +17,19 @@ body {
     margin: 0;
     font-family: 'Arial', sans-serif;
     color: var(--text-color);
-    overflow: hidden; /* 防止手機滾動 */
+    overflow: hidden;
+    flex-direction: column; /* 垂直排列子元素 */
 }
 
 .game-container {
     text-align: center;
     position: relative;
+    width: 100%; /* 讓容器佔滿寬度 */
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 h1 {
@@ -33,17 +40,20 @@ h1 {
 
 canvas {
     border: 5px solid var(--border-color);
-    background-color: var(--secondary-bg-color); /* 如果圖片載入失敗，會顯示這個背景色 */
+    background-color: var(--secondary-bg-color);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    touch-action: manipulation; /* 防止雙擊縮放等手機預設行為 */
+    touch-action: manipulation;
+    max-width: 100%; /* 確保畫布不會超出螢幕 */
+    height: auto; /* 保持長寬比 */
 }
 
 /* 虛擬方向鍵樣式 */
 .controls {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
+    position: relative; /* 改為相對定位 */
+    bottom: unset; /* 取消底部定位 */
+    left: unset; /* 取消左側定位 */
+    transform: unset; /* 取消 transform */
+    margin-top: 20px; /* 在畫布下方添加間距 */
     pointer-events: all;
     z-index: 1000;
 }
@@ -54,7 +64,7 @@ canvas {
     grid-template-rows: 1fr 1fr;
     gap: 5px;
     width: 150px;
-    height: 100px; /* 高度縮減，因為沒有下鍵 */
+    height: 100px;
 }
 
 .dpad button {
@@ -88,4 +98,30 @@ canvas {
 .dpad .right { 
     grid-column: 3 / 4;
     grid-row: 2 / 3;
+}
+
+/* 針對小螢幕的優化 */
+@media (max-width: 768px) {
+    h1 {
+        display: none; /* 在手機上隱藏標題，節省空間 */
+    }
+
+    body {
+        justify-content: flex-start; /* 讓內容從頂部開始排列 */
+        padding-top: 20px;
+    }
+    
+    .game-container {
+        height: auto;
+    }
+    
+    .dpad {
+        width: 120px; /* 縮小按鈕區域 */
+        height: 80px;
+    }
+
+    .dpad button {
+        padding: 10px; /* 縮小按鈕內距 */
+        font-size: 1.2em; /* 縮小字體 */
+    }
 }
