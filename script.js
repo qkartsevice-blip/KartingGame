@@ -57,7 +57,7 @@ const allQuestions = [
     },
     {
         question: "小小孩開小小卡丁車的好處?",
-        options: ["訓練專注力與判斷力", "訓練動作協調與核心控制", "以上皆是"],
+        options: ["訓練專注力"<br>"與判斷力", "訓練動作協調"<br>"與核心控制", "以上皆是"],
         correctAnswer: "以上皆是"
     }
 ];
@@ -338,3 +338,4 @@ canvas.addEventListener('click', (event) => {
 // 啟動遊戲迴圈與資源載入
 gameLoop();
 loadAssets();
+
