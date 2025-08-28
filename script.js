@@ -57,8 +57,8 @@ const allQuestions = [
     },
     {
         question: "小小孩開小小卡丁車可以訓練?",
-        options: ["專注力與判斷力", "動作協調與核心控制", "以上皆是"],
-        correctAnswer: "以上皆是"
+        options: ["專注力與判斷力", "動作協調與核心控制", "兩者皆是"],
+        correctAnswer: "兩者皆是"
     }
 ];
 
@@ -338,5 +338,6 @@ canvas.addEventListener('click', (event) => {
 // 啟動遊戲迴圈與資源載入
 gameLoop();
 loadAssets();
+
 
 
