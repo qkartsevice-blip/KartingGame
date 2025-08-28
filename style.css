@@ -1,74 +1,55 @@
-:root {
-    --primary-bg-color: #2c3e50;
-    --secondary-bg-color: #34495e;
-    --border-color: #bdc3c7;
-    --highlight-color: #f1c40f;
-    --text-color: #ecf0f1;
-    --button-color: rgba(52, 152, 219, 0.7);
-    --button-active-color: rgba(41, 128, 185, 0.9);
-}
-
 body {
-    background-color: var(--primary-bg-color);
+    background-color: #2c3e50;
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
     margin: 0;
     font-family: 'Arial', sans-serif;
-    color: var(--text-color);
-    overflow: hidden;
-    flex-direction: column; /* 垂直排列子元素 */
+    color: #ecf0f1;
+    overflow: hidden; /* 防止手機滾動 */
 }
 
 .game-container {
     text-align: center;
     position: relative;
-    width: 100%; /* 讓容器佔滿寬度 */
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 h1 {
     font-size: 2.5em;
     margin-bottom: 20px;
-    color: var(--highlight-color);
+    color: #f1c40f;
 }
 
 canvas {
-    border: 5px solid var(--border-color);
-    background-color: var(--secondary-bg-color);
+    border: 5px solid #bdc3c7;
+    background-color: #34495e; /* 如果圖片載入失敗，會顯示這個背景色 */
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-    touch-action: manipulation;
-    max-width: 100%; /* 確保畫布不會超出螢幕 */
-    height: auto; /* 保持長寬比 */
+    touch-action: manipulation; /* 防止雙擊縮放等手機預設行為 */
 }
 
 /* 虛擬方向鍵樣式 */
 .controls {
-    position: relative; /* 改為相對定位 */
-    bottom: unset; /* 取消底部定位 */
-    left: unset; /* 取消左側定位 */
-    transform: unset; /* 取消 transform */
-    margin-top: 20px; /* 在畫布下方添加間距 */
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     pointer-events: all;
     z-index: 1000;
 }
 
 .dpad {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+        ". up ."
+        "left . right";
     gap: 5px;
     width: 150px;
-    height: 100px;
+    height: 100px; /* 高度縮減，因為沒有下鍵 */
 }
 
 .dpad button {
-    background-color: var(--button-color);
+    background-color: rgba(52, 152, 219, 0.7);
     border: none;
     color: white;
     padding: 15px;
@@ -84,44 +65,9 @@ canvas {
 }
 
 .dpad button:active {
-    background-color: var(--button-active-color);
+    background-color: rgba(41, 128, 185, 0.9);
 }
 
-.dpad .up { 
-    grid-column: 2 / 3;
-    grid-row: 1 / 2;
-}
-.dpad .left { 
-    grid-column: 1 / 2;
-    grid-row: 2 / 3;
-}
-.dpad .right { 
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-}
-
-/* 針對小螢幕的優化 */
-@media (max-width: 768px) {
-    h1 {
-        display: none; /* 在手機上隱藏標題，節省空間 */
-    }
-
-    body {
-        justify-content: flex-start; /* 讓內容從頂部開始排列 */
-        padding-top: 20px;
-    }
-    
-    .game-container {
-        height: auto;
-    }
-    
-    .dpad {
-        width: 120px; /* 縮小按鈕區域 */
-        height: 80px;
-    }
-
-    .dpad button {
-        padding: 10px; /* 縮小按鈕內距 */
-        font-size: 1.2em; /* 縮小字體 */
-    }
-}
+.dpad .up { grid-area: up; }
+.dpad .left { grid-area: left; }
+.dpad .right { grid-area: right; }
