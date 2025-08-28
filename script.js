@@ -28,6 +28,11 @@ const playAgainButton = {
 const roadImage = new Image();
 const carImage = new Image();
 
+// 虛擬按鈕元素
+const upButton = document.getElementById('upButton');
+const leftButton = document.getElementById('leftButton');
+const rightButton = document.getElementById('rightButton');
+
 // 問題資料庫
 const allQuestions = [
     {
@@ -78,7 +83,6 @@ function loadAssets() {
     roadImage.src = 'road.png';
     carImage.src = 'car.png';
 }
-
 
 // 隨機打亂陣列順序的函式
 function shuffleArray(array) {
@@ -242,42 +246,23 @@ function gameLoop() {
     requestAnimationFrame(gameLoop);
 }
 
-// 點擊事件監聽器
-canvas.addEventListener('click', (event) => {
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    // 檢查是否點擊了「重新開始」按鈕
-    if (mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width &&
-        mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height) {
-        resetGame();
-    }
-    // 檢查是否點擊了「再玩一次」按鈕 (只有在遊戲結束或完成畫面才有效)
-    if (gameState === 'gameComplete' &&
-        mouseX >= playAgainButton.x && mouseX <= playAgainButton.x + playAgainButton.width &&
-        mouseY >= playAgainButton.y && mouseY <= playAgainButton.y + playAgainButton.height) {
-        resetGame();
-    }
-});
-
-// 玩家控制
-document.addEventListener('keydown', (e) => {
+// 處理玩家輸入的統一函式
+function handlePlayerInput(direction) {
     if (gameState === 'start') {
         gameState = 'moving';
         return;
     }
 
     if (gameState === 'moving') {
-        if (e.key === 'ArrowUp') car.y -= car.speed;
-        else if (e.key === 'ArrowDown') car.y += car.speed;
-        else if (e.key === 'ArrowLeft') { car.x -= car.speed; car.angle = -Math.PI / 12; }
-        else if (e.key === 'ArrowRight') { car.x += car.speed; car.angle = Math.PI / 12; }
+        if (direction === 'up') car.y -= car.speed;
+        else if (direction === 'down') car.y += car.speed;
+        else if (direction === 'left') { car.x -= car.speed; car.angle = -Math.PI / 12; }
+        else if (direction === 'right') { car.x += car.speed; car.angle = Math.PI / 12; }
     } else if (gameState === 'question') {
         let playerChoice = null;
-        if (e.key === 'ArrowLeft') playerChoice = currentQuestion.shuffledOptions[0];
-        else if (e.key === 'ArrowUp') playerChoice = currentQuestion.shuffledOptions[1];
-        else if (e.key === 'ArrowRight') playerChoice = currentQuestion.shuffledOptions[2];
+        if (direction === 'left') playerChoice = currentQuestion.shuffledOptions[0];
+        else if (direction === 'up') playerChoice = currentQuestion.shuffledOptions[1];
+        else if (direction === 'right') playerChoice = currentQuestion.shuffledOptions[2];
 
         if (playerChoice) {
             isAnswerCorrect = (playerChoice === currentQuestion.correctAnswer);
@@ -298,6 +283,14 @@ document.addEventListener('keydown', (e) => {
             }, 1000);
         }
     }
+}
+
+// 鍵盤事件監聽器
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowUp') handlePlayerInput('up');
+    else if (e.key === 'ArrowDown') handlePlayerInput('down');
+    else if (e.key === 'ArrowLeft') handlePlayerInput('left');
+    else if (e.key === 'ArrowRight') handlePlayerInput('right');
 });
 
 document.addEventListener('keyup', (e) => {
@@ -306,6 +299,42 @@ document.addEventListener('keyup', (e) => {
     }
 });
 
-// 啟動遊戲迴圈
+// 虛擬按鈕事件監聽器
+if (upButton && leftButton && rightButton) {
+    upButton.addEventListener('mousedown', () => handlePlayerInput('up'));
+    leftButton.addEventListener('mousedown', () => handlePlayerInput('left'));
+    rightButton.addEventListener('mousedown', () => handlePlayerInput('right'));
+    
+    // 讓按鈕放開時重置角度
+    leftButton.addEventListener('mouseup', () => car.angle = 0);
+    rightButton.addEventListener('mouseup', () => car.angle = 0);
+    
+    // 考慮手機觸控事件
+    upButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('up'); });
+    leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('left'); });
+    rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('right'); });
+    
+    leftButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
+    rightButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
+}
+
+// 點擊事件監聽器 (用於重新開始按鈕)
+canvas.addEventListener('click', (event) => {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    if (mouseX >= restartButton.x && mouseX <= restartButton.x + restartButton.width &&
+        mouseY >= restartButton.y && mouseY <= restartButton.y + restartButton.height) {
+        resetGame();
+    }
+    if (gameState === 'gameComplete' &&
+        mouseX >= playAgainButton.x && mouseX <= playAgainButton.x + playAgainButton.width &&
+        mouseY >= playAgainButton.y && mouseY <= playAgainButton.y + playAgainButton.height) {
+        resetGame();
+    }
+});
+
+// 啟動遊戲迴圈與資源載入
 gameLoop();
 loadAssets();
