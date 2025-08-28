@@ -273,6 +273,13 @@ function handlePlayerInput(direction) {
     }
 }
 
+// 重置卡丁車角度的函式
+function resetCarAngle() {
+    if (gameState === 'moving') {
+        car.angle = 0;
+    }
+}
+
 // 設置事件監聽器
 function setupEventListeners() {
     // 鍵盤事件
@@ -283,28 +290,25 @@ function setupEventListeners() {
         else if (e.key === 'ArrowRight') handlePlayerInput('right');
     });
 
-    document.addEventListener('keyup', () => {
-        if (gameState === 'moving') {
-            car.angle = 0;
-        }
-    });
+    document.addEventListener('keyup', resetCarAngle);
 
     // 虛擬按鈕事件
     if (upButton && leftButton && rightButton) {
         upButton.addEventListener('mousedown', () => handlePlayerInput('up'));
         leftButton.addEventListener('mousedown', () => handlePlayerInput('left'));
         rightButton.addEventListener('mousedown', () => handlePlayerInput('right'));
-
-        leftButton.addEventListener('mouseup', () => car.angle = 0);
-        rightButton.addEventListener('mouseup', () => car.angle = 0);
+        
+        // 讓按鈕放開時重置角度
+        leftButton.addEventListener('mouseup', resetCarAngle);
+        rightButton.addEventListener('mouseup', resetCarAngle);
 
         // 考慮手機觸控事件
         upButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('up'); });
         leftButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('left'); });
         rightButton.addEventListener('touchstart', (e) => { e.preventDefault(); handlePlayerInput('right'); });
-
-        leftButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
-        rightButton.addEventListener('touchend', (e) => { e.preventDefault(); car.angle = 0; });
+        
+        leftButton.addEventListener('touchend', resetCarAngle);
+        rightButton.addEventListener('touchend', resetCarAngle);
     }
 
     // Canvas 點擊事件 (用於重新開始按鈕)
@@ -326,6 +330,8 @@ function setupEventListeners() {
 }
 
 // 啟動遊戲
-loadAssets();
-gameLoop();
-setupEventListeners();
+document.addEventListener('DOMContentLoaded', () => {
+    loadAssets();
+    gameLoop();
+    setupEventListeners();
+});
